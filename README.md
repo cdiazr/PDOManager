@@ -1,4 +1,4 @@
-# PDOManager
+# PDOManager v1.0.0
 Manage PDO statements easly thanks to this PDO wrapper with prepared statements.
 
 Table of Contents
