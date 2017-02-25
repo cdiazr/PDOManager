@@ -32,6 +32,7 @@ class PDOManager
 
     const INSERT = "INSERT INTO ";
     const UPDATE = "UPDATE ";
+    const DELETE = "DELETE ";
     const VALUES = " VALUES ";
     const SET = " SET ";
 
