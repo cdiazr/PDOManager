@@ -44,7 +44,7 @@ class PDOManager
     const GROUPBY = " GROUP BY ";
     const JOIN = " JOIN ";
     const ON = " ON ";
-    const COUNT = " COUNT";
+    const COUNT = "COUNT";
 
     /**
      * @return mixed
@@ -177,15 +177,21 @@ class PDOManager
      * @return int
      * @throws Exception
      */
-    public function getCount($t, $f = null)
+    public function getCount($t, $f = null, $debug = null)
     {
         if (empty($t))
             throw new Exception;
 
-        if(!is_null($f))
-            $count = self::COUNT . "(" . $f . ") ";
+        $f = !is_null($f)? $f : '*';
+
+        $count = self::COUNT . "(" . $f . ")";
 
         $query = self::SELECT . $count . self::FROM . $t . $this->where . $this->orderBy;
+
+        if($debug == 1) {
+            $this->setLastQueries($query.PHP_EOL);
+            $this->lastQueries($query);
+        }
 
         $result = self::execQuery($query);
 
@@ -206,10 +212,7 @@ class PDOManager
         if (empty($t))
             throw new Exception;
 
-        if(is_null($c) || empty($c))
-            $c = '*';
-
-        $columns = is_array($c) ? implode(', ', $c) : $c;
+        $columns = $this->getColumnsPrepare($c);
 
         $query = self::SELECT . $columns . self::FROM . $t . $this->join . $this->where . $this->orderBy;
 
@@ -306,7 +309,7 @@ class PDOManager
      *
      * @return string
      */
-    public funcion orWhere($f, $v, $t = null)
+    public function orWhere($f, $v, $t = null)
     {
         $v = (is_string($v)) ? "'" . $v . "'" : $v;
 
@@ -320,7 +323,7 @@ class PDOManager
 
         $o = ($t == 'S' || $t == 'C' || $t == 'E') ? ' LIKE ' :' = ';
 
-        return $this->orWhere .= self::ORWHERE . $f . $o . $v;
+        return $this->where .= self::ORWHERE . $f . $o . $v;
     }
 
     /**
@@ -342,7 +345,7 @@ class PDOManager
      * @param Field $field
      * @return string
      */
-    public function orderBy($field)
+    public function groupBy($field)
     {
         return $this->groupBy .= self::GROUPBY . $f;
     }
@@ -364,11 +367,25 @@ class PDOManager
         $this->join =  " " . $type . self::JOIN . $t1 . self::ON . $t1 . '.' . $f1 . " = " . $t2 . '.' . $f2;
     }
 
+    public function subQueryAsColumn($table, $columns = null, $columnName)
+    {
+        $cols = $this->getColumnsPrepare($columns);
+
+        $subQuery = '(' . $this->__buildSelect($cols, $table) . ') as ' . $columnName; 
+        $this->cleanQuery();
+
+        return $subQuery;
+    }
+
     /**
      * This function is useful if you want to display results from queries
      * @param $var
      */
-    public function dd($var) {
+    public function dd($var, $night = 0) {
+        $html = '<html><head></head><body style="background: black; color: green"></body></html>';
+        if($night)
+            echo $html;
+
         echo "<pre>";
         print_r($var);
         die;
@@ -385,6 +402,11 @@ class PDOManager
             print_r($this->lastQueries);
         else
             print_r($query);
+    }
+
+    private function __buildSelect($columns, $table)
+    {
+        return self::SELECT . $columns . self::FROM . $table . str_replace("'", "", $this->where);
     }
 
     /**
@@ -415,6 +437,7 @@ class PDOManager
 
             $this->cleanQuery();
 
+            $rows = [];
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC))
                 $rows[] = $row;
 
@@ -448,5 +471,13 @@ class PDOManager
             $params .= $i == count($fields)? '?' : '?,';
 
         return ['fields' => implode(',', $fields), 'params' => $params, 'values' => $values];
+    }
+
+    private function getColumnsPrepare($data)
+    {
+        if(is_null($data) || empty($data))
+            $data = '*';
+
+        return is_array($data) ? implode(', ', $data) : $data;
     }
 }
