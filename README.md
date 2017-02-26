@@ -2,6 +2,7 @@
 Manage PDO statements easly thanks to this PDO wrapper with prepared statements.
 
 Table of Contents
+**[App Example](#app-example)**
 **[Prerequisites](#prerequisites)**
 **[Installation](#installation)**
 **[Initialization](#initialization)**
@@ -11,7 +12,11 @@ Table of Contents
 **[Count](#count)**
 **[Select Query](#select-query)**
 **[Where Conditions](#where-conditions)**
+**[Sub Queries](#subqueries)**
 **[Join Method](#join-method)**
+
+### App example
+I build and app for intern messages just to show you in a real example how PDOManager class works. This app is using almost all methods that you can use with PDOManager object.
 
 ### Prerequisites
 To make it run, you will need php pdo extensions enabled. The extension will depend of type of database you are going to use. PDOManager can work with many types of database such us MySQL, SQL Server, PostgreSQL, Oracle, SQL Lite, ODBC, Cubrid, SyBase, Firebird and IBM. But this class was thinked to use with the most used ones as MySQL, SQL Server, PostgreSQL adn SQL Lite.
@@ -102,7 +107,7 @@ $db->get('table');
 ```
 Notice those both statments should be together always on that order.
 
-### SubQuerys
+### Sub Queries
 Now you can include subqueries into the main one just when you need load some value as a column into the main SELECT query.
 You can use as many subselect into main query as you need, just you need to construct each subQuery as a group before to call other where, orwhere, join, groupby, orderby or any other to add into main SELECT with get() method.
 ```php
