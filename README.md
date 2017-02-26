@@ -1,4 +1,4 @@
-# PDOManager v1.0.0
+# PDOManager v1.1.0
 Manage PDO statements easly thanks to this PDO wrapper with prepared statements.
 
 Table of Contents
@@ -101,6 +101,22 @@ $db->get('table');
 // Gives: SELECT * FROM table WHERE field1 = 'value1' OR field1 = 'value2'
 ```
 Notice those both statments should be together always on that order.
+
+### SubQuerys
+Now you can include subqueries into the main one just when you need load some value as a column into the main SELECT query.
+You can use as many subselect into main query as you need, just you need to construct each subQuery as a group before to call other where, orwhere, join, groupby, orderby or any other to add into main SELECT with get() method.
+```php
+# ------ Group SELECT column 2 ---------
+$column = ['field2']; 
+$this->where('field1', 'table1.field');
+$subQuery = $this->subQueryAsColumn('table2', $column, 'columnName');
+# -------------------------------
+
+$select = ['field1', $subQuery, 'field3' ];
+$this->get('table1', $select);
+// Gives: 
+// SELECT field1, (SELECT field2 FROM table2 WHERE field1 = table1.field) as columnName, field3 FROM table1
+```
 
 ## Methods
 
